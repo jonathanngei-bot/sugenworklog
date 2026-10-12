@@ -200,9 +200,9 @@
       document.head.appendChild(style);document.querySelector('header').append(loginButton,loginPanel);
       const select=document.getElementById('staffLoginSelect'),pin=document.getElementById('staffLoginPin'),hint=document.getElementById('staffLoginHint');
       function memberKeyForLogin(member){return member.id||member.email||member.name}
-      function renderStaffLogin(){const available=members.filter(member=>member.status!=='inactive');const saved=localStorage.getItem(staffSessionKey)||'';select.innerHTML=available.length?'<option value="">Choose your name</option>'+available.map(member=>`<option value="${escapeHtml(member.name)}">${escapeHtml(member.name)}</option>`).join(''):'<option value="">No active staff names yet</option>';select.value=saved;hint.textContent=available.length?'Choose your name and enter your login PIN.':'Ask the administrator to add your name first.';if(saved)loginButton.textContent='Staff: '+saved;}
+      function renderStaffLogin(){const available=members.filter(member=>member.status!=='inactive');const saved=localStorage.getItem(staffSessionKey)||'';select.innerHTML=available.length?'<option value="">Choose your name</option>'+available.map(member=>`<option value="${escapeHtml(member.name)}">${escapeHtml(member.name)}</option>`).join(''):'<option value="">No active staff names yet</option>';select.value=saved;hint.textContent=available.length?'Choose your name and enter your login PIN. Default PIN is 1234 unless the admin set a different one.':'Ask the administrator to add your name first.';if(saved)loginButton.textContent='Staff: '+saved;}
       loginButton.onclick=()=>{loginPanel.hidden=!loginPanel.hidden;if(!loginPanel.hidden)renderStaffLogin()};
-      document.getElementById('staffLoginContinue').onclick=()=>{const name=select.value;if(!name){hint.textContent='Choose your name first.';return}const member=members.find(item=>item.name===name);const pins=JSON.parse(localStorage.getItem('work-diary-staff-pins-v1')||'{}');if(!member||pin.value!==pins[memberKeyForLogin(member)]){hint.textContent='The PIN is not correct. Try again.';pin.value='';return}localStorage.setItem(staffSessionKey,name);loginButton.textContent='Staff: '+name;const attendance=staffAttendance();attendance[member.id]={status:'in',time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})};localStorage.setItem(staffAttendanceKey,JSON.stringify(attendance));renderActiveMembers();const submittedBy=document.getElementById('submittedBy');if(submittedBy)submittedBy.value=name;pin.value='';loginPanel.hidden=true;};
+      document.getElementById('staffLoginContinue').onclick=()=>{const name=select.value;if(!name){hint.textContent='Choose your name first.';return}const member=members.find(item=>item.name===name);const pins=JSON.parse(localStorage.getItem('work-diary-staff-pins-v1')||'{}');const expectedPin=pins[memberKeyForLogin(member)]||'1234';if(!member||pin.value!==expectedPin){hint.textContent='The PIN is not correct. Try again.';pin.value='';return}localStorage.setItem(staffSessionKey,name);loginButton.textContent='Staff: '+name;const attendance=staffAttendance();attendance[member.id]={status:'in',time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})};localStorage.setItem(staffAttendanceKey,JSON.stringify(attendance));renderActiveMembers();const submittedBy=document.getElementById('submittedBy');if(submittedBy)submittedBy.value=name;pin.value='';loginPanel.hidden=true;};
       renderStaffLogin();const saved=localStorage.getItem(staffSessionKey)||'';const submittedBy=document.getElementById('submittedBy');if(saved&&submittedBy)submittedBy.value=saved;
     })();
   </script>
@@ -211,7 +211,6 @@
     ['project','work'].forEach(id=>{const label=document.querySelector(`label[for="${id}"]`);if(label&&!label.querySelector('.required-star'))label.insertAdjacentHTML('beforeend','<span class="required-star" aria-hidden="true">*</span>');});
   </script>
 </body>
-</publish>
-</investigate bugs and fix>
+</html>
 
 
