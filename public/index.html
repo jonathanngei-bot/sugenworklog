@@ -210,6 +210,8 @@
   <script>
     ['project','work'].forEach(id=>{const label=document.querySelector(`label[for="${id}"]`);if(label&&!label.querySelector('.required-star'))label.insertAdjacentHTML('beforeend','<span class="required-star" aria-hidden="true">*</span>');});
   </script>
+  <!-- Loads last so every app function and global exists before syncing starts. -->
+  <script src="sync.js"></script>
 </body>
 </html>
 

@@ -1,0 +1,20 @@
+{
+  "name": "sugen-work-diary",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Work diary with admin portal, staff check-in, and project reporting.",
+  "type": "module",
+  "scripts": {
+    "dev": "netlify dev",
+    "db:status": "netlify database status",
+    "db:apply": "netlify database migrations apply"
+  },
+  "dependencies": {
+    "@netlify/database": "latest",
+    "@netlify/functions": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "typescript": "^7.0.2"
+  }
+}
