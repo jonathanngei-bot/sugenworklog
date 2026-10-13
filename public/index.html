@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -56,7 +56,7 @@
     <section class="stats" aria-label="Work diary summary"><div class="stat"><div class="stat-label">Entries saved</div><div class="stat-value" id="entryCount">0</div></div><div class="stat"><div class="stat-label">Hours worked today</div><div class="stat-value" id="hourCount">0</div></div></section>
     <section class="panel"><h2 id="formHeading">Add a work entry</h2><form id="entryForm"><input type="hidden" id="editId"><div class="grid"><div class="field"><label for="date">Date</label><input id="date" type="date" required></div></div><div class="field"><label for="submittedBy">Submitted by</label><select id="submittedBy" required><option value="">Select a staff member</option></select></div><div class="field"><label for="project">Project or site</label><select id="project" required><option value="">Select a project</option><option>Afya Yangu</option><option>Sugen</option><option value="Other">Other</option></select></div><div class="field" id="otherProjectField" hidden><label for="otherProject">Other project or site</label><input id="otherProject" placeholder="Enter project or site name"></div><div class="field"><label for="work">Work completed</label><textarea id="work" required placeholder="Write the full work completed report here. This area expands as you type."></textarea></div><div class="field"><label for="notes">Additional notes</label><textarea id="notes" placeholder="Add blockers, decisions made, pending tasks, or next steps."></textarea></div><div class="actions"><button class="primary" type="submit">Save entry</button><button class="secondary" id="cancelEdit" type="button" hidden>Cancel edit</button><span class="message" id="message" aria-live="polite"></span></div></form></section>
     <section class="panel" id="teamPanel" hidden><h2>Team members</h2><p class="meta">Add each staff member using their name only.</p><div class="actions"><button class="primary" id="addMember" type="button">Add member</button></div><div id="memberList" style="margin-top:16px"></div></section>
-    <section class="panel" id="adminTasks" hidden><h2>Administrator tools</h2><p class="meta">All administrator roles in one menu.</p><div id="adminToolMenu"><button class="admin-add-member" id="adminAddMember" type="button"><span class="plus">+</span> Add member</button><div class="admin-task-list"><button class="admin-task" id="viewDashboard" type="button"><span><strong>View dashboard</strong><small>See saved entries, hours, and staff activity.</small></span><span>›</span></button><button class="admin-task" id="setStaffPins" type="button"><span><strong>Set staff PINs</strong><small>Create or update a PIN for each staff member.</small></span><span>›</span></button><button class="admin-task" id="setStaffPasswords" type="button"><span><strong>Set staff passwords</strong><small>Create or update a password for each staff member.</small></span><span>›</span></button></div></div><div id="staffPinPanel" hidden style="margin-top:14px"><h3 style="margin:0 0 8px">Staff PINs</h3><div id="staffPinList"></div></div><div id="staffPasswordPanel" hidden style="margin-top:14px"><h3 style="margin:0 0 8px">Staff Passwords</h3><div id="staffPasswordList"></div></div><div id="staffHoursPanel" hidden style="margin-top:14px"><h3 style="margin:0 0 8px">Staff Worked Hours</h3><div id="staffHoursList"></div></div></section>
+    <section class="panel" id="adminTasks" hidden><h2>Administrator tools</h2><p class="meta">All administrator roles in one menu.</p><div id="adminToolMenu"><button class="admin-add-member" id="adminAddMember" type="button"><span class="plus">+</span> Add member</button><div class="admin-task-list"><button class="admin-task" id="viewDashboard" type="button"><span><strong>View dashboard</strong><small>See saved entries, hours, and staff activity.</small></span><span>›</span></button><button class="admin-task" id="setStaffPins" type="button"><span><strong>Set staff PINs</strong><small>Create or update a 4-8 digit PIN for each staff member.</small></span><span>›</span></button></div></div><div id="staffPinPanel" hidden style="margin-top:14px"><h3 style="margin:0 0 8px">Staff PINs (used for login)</h3><p class="meta" style="margin-bottom:10px">PINs are hashed server-side. Default is 1234 until you set one.</p><div id="staffPinList"></div></div><div id="staffHoursPanel" hidden style="margin-top:14px"><h3 style="margin:0 0 8px">Staff Worked Hours</h3><div id="staffHoursList"></div></div></section>
     <section class="panel" id="staffCheckPanel" hidden><h2>Staff check in</h2><p class="meta" id="checkStatus">You have not checked in today.</p><div class="actions"><button class="primary" id="checkIn" type="button">Check in</button><button class="secondary" id="checkOut" type="button">Check out</button></div></section>
     <section class="panel" id="meetingPanel"><h2>Team meeting room</h2><p class="meta">Add a meeting link for the team to connect.</p><div class="field"><label for="meetingLink">Meeting link</label><input id="meetingLink" type="url" placeholder="Paste a Google Meet, Teams, or Zoom link"></div><div class="actions"><button class="primary" id="saveMeeting" type="button">Save meeting link</button><button class="primary" id="joinMeeting" type="button" style="background:#16804f">Join meeting</button></div><p class="message" id="meetingMessage" aria-live="polite"></p></section>
     <section class="panel"><h2>Saved entries</h2><div id="entries"></div></section><p class="footer">Entries are saved only in this browser on this device.</p>
@@ -82,7 +82,7 @@
     if(![...$('project').options].some(option=>option.value==='Call Center')){$('project').insertBefore(new Option('Call Center','Call Center'),$('project').options[$('project').options.length-1])}
     function renderSubmittedBy(){const field=$('submittedBy');if(!field)return;const current=field.value;const active=members.filter(member=>member.status!=='inactive'&&String(member.name||'').trim());field.innerHTML='<option value="">Select a staff member</option>'+active.map(member=>`<option value="${escapeHtml(member.name)}">${escapeHtml(member.name)}</option>`).join('');if(active.some(member=>member.name===current))field.value=current}
     function renderMembers(){const list=$('memberList');list.innerHTML=members.length?members.map(m=>`<div class="entry member-row"><div><strong>${escapeHtml(m.name)}</strong><div class="meta">Staff member</div></div><span class="${m.status==='inactive'?'status-inactive':'status-active'}">${m.status==='inactive'?'Inactive':'Active'}</span></div>`).join(''):'<p class="empty">No team members added yet.</p>'}
-    function addNewMember(){const name=prompt('Staff member name');if(!name)return;const password=prompt('Set a password for '+name+' (optional)');members.push({id:uid(),name:name.trim(),status:'active'});localStorage.setItem(memberKey,JSON.stringify(members));if(password){const passwords=JSON.parse(localStorage.getItem(staffPasswordKey)||'{}');passwords[uid()]=password;localStorage.setItem(staffPasswordKey,JSON.stringify(passwords));}renderMembers();renderActiveMembers();renderSubmittedBy();}
+    function addNewMember(){const name=prompt('Staff member name');if(!name)return;const pin=prompt('Set a 4-8 digit PIN for '+name+' (optional, default 1234)');if(pin&&!/^\d{4,8}$/.test(pin)){alert('PIN must be 4-8 digits.');return}const newMember={id:uid(),name:name.trim(),status:'active'};members.push(newMember);localStorage.setItem(memberKey,JSON.stringify(members));if(pin){const pins=JSON.parse(localStorage.getItem(staffPinKey)||'{}');pins[newMember.id]=pin;localStorage.setItem(staffPinKey,JSON.stringify(pins));}renderMembers();renderActiveMembers();renderSubmittedBy();}
     $('addMember').onclick=addNewMember;$('addMemberHeader').onclick=addNewMember;$('adminAddMember').onclick=addNewMember;
     renderSubmittedBy();
     function renderActiveMembers(){const activeMembers=members.filter(member=>member.status!=='inactive');$('checkHeader').innerHTML=`<span class="header-active-dot"></span>Active: ${activeMembers.length}`;$('checkHeader').classList.add('check-active');$('activeMemberMenu').innerHTML=activeMembers.length?`<strong>Active members (${activeMembers.length})</strong><ul>${activeMembers.map(member=>`<li>${escapeHtml(member.name)}</li>`).join('')}</ul>`:'<strong>No active members yet</strong>'}
@@ -245,26 +245,7 @@
       bar.append(msg,close);
       setTimeout(()=>{if(!bar.hidden)bar.hidden=true;},5000);
     }
-  </script>
-  <script>
-    /* Staff passwords panel */
-    const staffPasswordKey='work-diary-staff-passwords-v1';
-    function renderStaffPasswords(){
-      const passwords=JSON.parse(localStorage.getItem(staffPasswordKey)||'{}');
-      $('staffPasswordList').innerHTML=members.length?members.map((m,index)=>{const id=m.id||m.email||`${m.name}-${index}`;return `<div class="pin-row"><div><strong>${escapeHtml(m.name)}</strong><div class="meta">Staff member</div></div><label class="meta" for="staffPass${index}">Password<input id="staffPass${index}" type="password" placeholder="Enter password" value="${escapeHtml(passwords[id]||'')}"></label><button class="secondary tiny" type="button" data-member-id="${escapeHtml(id)}" data-pass-input="staffPass${index}">Save password</button></div>`}).join(''):'<p class="empty">Add a staff member before setting a password.</p>';
-      document.querySelectorAll('[data-member-id][data-pass-input]').forEach(button=>button.onclick=()=>{
-        const input=$(button.dataset.passInput);
-        const password=input.value.trim();
-        if(!password){alert('Enter a password.');return}
-        const updated=JSON.parse(localStorage.getItem(staffPasswordKey)||'{}');
-        updated[button.dataset.memberId]=password;
-        localStorage.setItem(staffPasswordKey,JSON.stringify(updated));
-        input.value='';
-        alert('Staff password saved.');
-      });
-    }
-  </script>
-  <script>
+  </script><script>
     /* Staff hours panel */
     function renderStaffHours(){
       const attendance=staffAttendance();
@@ -280,8 +261,7 @@
   <script>
     /* Admin task buttons for new panels */
     adminTaskList.insertAdjacentHTML('beforeend','<button class="admin-task" id="adminViewStaffHours" type="button"><span><strong>View staff hours</strong><small>See worked hours for each staff member today.</small></span><span>›</span></button>');
-    $('setStaffPasswords').onclick=()=>{$('staffPasswordPanel').hidden=!$('staffPasswordPanel').hidden;if(!$('staffPasswordPanel').hidden)renderStaffPasswords();$('staffPinPanel').hidden=true;$('staffHoursPanel').hidden=true;$('staffManager').hidden=true;};
-    $('adminViewStaffHours').onclick=()=>{$('staffHoursPanel').hidden=!$('staffHoursPanel').hidden;if(!$('staffHoursPanel').hidden)renderStaffHours();$('staffPinPanel').hidden=true;$('staffPasswordPanel').hidden=true;$('staffManager').hidden=true;};
+    $('adminViewStaffHours').onclick=()=>{$('staffHoursPanel').hidden=!$('staffHoursPanel').hidden;if(!$('staffHoursPanel').hidden)renderStaffHours();$('staffPinPanel').hidden=true;$('staffManager').hidden=true;};
   </script>
   <style>.required-star{color:#dc2626;margin-left:3px;font-weight:800}</style>
   <script>
@@ -291,5 +271,6 @@
   <script src="sync.js"></script>
 </body>
 </html>
+
 
 
