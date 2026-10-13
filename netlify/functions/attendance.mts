@@ -7,6 +7,9 @@ export interface Attendance {
   work_date: string;
   status: string;
   time: string;
+  check_in: string | null;
+  check_out: string | null;
+  hours: string;
 }
 
 function today(): string {
@@ -16,7 +19,10 @@ function today(): string {
 
 const SELECT = `a.member_id, m.name AS member_name,
                 to_char(a.work_date, 'YYYY-MM-DD') AS work_date,
-                a.status, a.time
+                a.status, a.time,
+                to_char(a.check_in,  'YYYY-MM-DD"T"HH24:MI:SS') AS check_in,
+                to_char(a.check_out, 'YYYY-MM-DD"T"HH24:MI:SS') AS check_out,
+                a.hours::text AS hours
                   FROM attendance a
                   JOIN members m ON m.id = a.member_id`;
 
@@ -46,13 +52,24 @@ export default async (req: Request, context: Context) => {
       const time = str(body.time) ||
         new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
+      // Optional automatic-hours fields: the client stamps check-in/check-out.
+      const checkIn = str(body.checkIn) || null;
+      const checkOut = str(body.checkOut) || null;
+      const hoursRaw = Number(body.hours);
+      const hours = Number.isFinite(hoursRaw) && hoursRaw >= 0 ? hoursRaw : 0;
+
       // Upsert: one row per member per day.
       const rows = await db.sql<Attendance>`
-        INSERT INTO attendance (id, member_id, work_date, status, time, updated_at)
-        VALUES (${uid()}, ${memberId}, ${date}, ${status}, ${time}, NOW())
+        INSERT INTO attendance (id, member_id, work_date, status, time, check_in, check_out, hours, updated_at)
+        VALUES (${uid()}, ${memberId}, ${date}, ${status}, ${time}, ${checkIn}, ${checkOut}, ${hours}, NOW())
         ON CONFLICT (member_id, work_date)
-        DO UPDATE SET status = EXCLUDED.status, time = EXCLUDED.time, updated_at = NOW()
-        RETURNING member_id, to_char(work_date, 'YYYY-MM-DD') AS work_date, status, time`;
+        DO UPDATE SET status = EXCLUDED.status, time = EXCLUDED.time,
+                      check_in = EXCLUDED.check_in, check_out = EXCLUDED.check_out,
+                      hours = EXCLUDED.hours, updated_at = NOW()
+        RETURNING member_id, to_char(work_date, 'YYYY-MM-DD') AS work_date, status, time,
+                  to_char(check_in, 'YYYY-MM-DD"T"HH24:MI:SS') AS check_in,
+                  to_char(check_out, 'YYYY-MM-DD"T"HH24:MI:SS') AS check_out,
+                  hours::text AS hours`;
 
       return json({ record: rows[0] }, 201);
     }

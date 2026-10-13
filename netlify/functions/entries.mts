@@ -34,7 +34,10 @@ async function create(req: Request): Promise<Response> {
   if (!work) return error("Work completed is required.");
   if (!project) return error("Project or site is required.");
 
-  const hours = Number(body.hours);
+  // Hours are no longer typed in by staff — they default to 0 when absent
+  // (real hours are calculated automatically from check-in / check-out).
+  const hoursRaw = body.hours;
+  const hours = hoursRaw == null || hoursRaw === "" ? 0 : Number(hoursRaw);
   if (!Number.isFinite(hours) || hours < 0) return error("Hours worked must be a number.");
 
   const id = str(body.id) || uid();
@@ -70,7 +73,8 @@ async function update(req: Request, id: string): Promise<Response> {
   if (!work) return error("Work completed is required.");
   if (!project) return error("Project or site is required.");
 
-  const hours = Number(body.hours);
+  const hoursRaw = body.hours;
+  const hours = hoursRaw == null || hoursRaw === "" ? 0 : Number(hoursRaw);
   if (!Number.isFinite(hours) || hours < 0) return error("Hours worked must be a number.");
 
   const rows = await db.sql<Entry>`

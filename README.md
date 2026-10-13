@@ -1,7 +1,9 @@
 # Sugen Work Diary
 
 A daily work log for the Sugen / Afya Yangu team: staff check-in, work entries
-per project, and an admin portal for managing the team.
+per project, and an admin portal for managing the team. Hours worked are **not
+typed in** — they are calculated automatically from a staff member's check-in
+to their check-out.
 
 **Live site:** https://sugenworklogdiary.netlify.app
 
@@ -51,6 +53,24 @@ and layers the API underneath it:
 Staff choose their name and enter a PIN. PINs are stored **hashed** (SHA-256,
 server-side) — the API never returns them, and they are not readable from the
 browser. Until an admin sets a PIN, the default is **`1234`**.
+
+## Automatic hours
+
+Staff never enter hours. Logging in checks the member in; checking out stops
+the clock. The time between check-in and check-out becomes that day's hours,
+shown live in the attendance menu and summed into the "Hours worked today"
+statistic. Old, hand-entered hours on past entries are left untouched.
+
+## Admin portal
+
+There is a single **Admin tools** button in the header. After signing in, it
+opens one menu listing every administrator role:
+
+- **Add member** — create a staff member profile
+- **View dashboard** — see saved entries, hours, and staff activity
+- **Set staff PINs** — create or update a PIN for each staff member
+- **Manage staff status** — activate or deactivate team members
+- **View all work entries** — review every saved work report
 
 Administrator access is gated in the UI (`jonathanngei5@gmail.com` / `1027`).
 

@@ -154,7 +154,15 @@
       if (!rec || !rec.status) continue;
       await call("/api/attendance", {
         method: "POST",
-        body: { memberId: memberId, status: rec.status, time: rec.time, date: date },
+        body: {
+          memberId: memberId,
+          status: rec.status,
+          time: rec.time,
+          date: date,
+          checkIn: rec.inAt || "",
+          checkOut: rec.outAt || "",
+          hours: Number(rec.hours) || 0,
+        },
       }).catch(function (err) {
         console.warn("attendance sync failed", err);
       });
@@ -209,7 +217,13 @@
       const r = await call("/api/attendance?date=" + localToday());
       const map = {};
       (r.attendance || []).forEach(function (row) {
-        map[row.member_id] = { status: row.status, time: row.time };
+        map[row.member_id] = {
+          status: row.status,
+          time: row.time,
+          inAt: row.check_in || "",
+          outAt: row.check_out || "",
+          hours: Number(row.hours) || 0,
+        };
       });
       result.attendance = map;
     } catch (e) {
