@@ -2,3 +2,4 @@
 node_modules/
 *.log
 .agents/
+trigger-build.ps1
